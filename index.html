@@ -2,100 +2,447 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Tube Tolerance Lookup</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <style>
 :root{
   --bg:#15181c;
   --bg2:#20262d;
   --card:#dde2e8;
+  --card2:#ffffff;
   --ink:#111827;
   --muted:#5b6572;
   --line:#aeb7c2;
   --accent:#6b7280;
   --accent2:#4b5563;
+  --accent3:#8b5e34;
   --green:#eef2f7;
   --shadow:0 18px 50px rgba(0,0,0,.28);
 }
+.page{
+  min-height:100vh;
+  background:
+    radial-gradient(circle at top left, rgba(255,255,255,.12), transparent 24%),
+    radial-gradient(circle at top right, rgba(255,255,255,.05), transparent 26%),
+    linear-gradient(180deg, var(--bg) 0%, var(--bg2) 100%);
+  color:var(--ink);
+}
+  .page::before{
+    content:"";
+    position:fixed;
+    inset:0;
+    pointer-events:none;
+    background:
+      repeating-linear-gradient(45deg, rgba(255,255,255,.03) 0 2px, transparent 2px 10px),
+      repeating-linear-gradient(-45deg, rgba(0,0,0,.08) 0 2px, transparent 2px 12px);
+    opacity:.7;
+  }
 *{box-sizing:border-box}
-body{margin:0;font-family:Arial,Helvetica,sans-serif;color:var(--ink);background:linear-gradient(180deg,var(--bg),var(--bg2))}
-.page{min-height:100vh;padding:18px;background:
-  radial-gradient(circle at top left, rgba(255,255,255,.12), transparent 24%),
-  radial-gradient(circle at top right, rgba(255,255,255,.05), transparent 26%),
-  linear-gradient(180deg, var(--bg) 0%, var(--bg2) 100%);}
-.wrap{max-width:920px;margin:auto}
-header{color:white;text-align:center;padding:8px 0 14px}
-h1{margin:0;font-size:clamp(28px,5vw,40px)}
-.sub{margin-top:6px;color:#cbd5e1;font-size:13px}
-.card{background:linear-gradient(180deg, rgba(245,248,252,.98), rgba(219,226,234,.98));border:1px solid rgba(108,117,128,.42);border-radius:22px;padding:16px;box-shadow:var(--shadow)}
-.tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px}
-.tab{border:1px solid #707783;background:linear-gradient(180deg,#7b8491,#525a66);color:#f8fafc;border-radius:14px;padding:14px 10px;font-weight:800;font-size:16px;min-height:52px}
-.tab.active{background:linear-gradient(180deg,#4b5563,#2f3742);box-shadow:0 10px 18px rgba(0,0,0,.3)}
+body{margin:0;font-family:Arial,Helvetica,sans-serif}
+header{
+  color:white;
+  padding:22px 18px 14px;
+  text-align:center;
+}
+.brand{
+  max-width:900px;
+  margin:0 auto;
+}
+header h1{
+  margin:0;
+  font-size:clamp(28px, 5vw, 40px);
+  letter-spacing:.2px;
+}
+header .sub{
+  margin-top:6px;
+  color:#cbd5e1;
+  font-size:13px;
+}
+main{max-width:900px;margin:auto;padding:0 14px 20px}
+.card{
+  background:
+    linear-gradient(180deg, rgba(245,248,252,.98), rgba(219,226,234,.98)),
+    repeating-linear-gradient(90deg, rgba(17,24,39,.05) 0 1px, transparent 1px 12px);
+  border:1px solid rgba(108,117,128,.42);
+  border-radius:22px;
+  padding:16px;
+  margin-bottom:16px;
+  box-shadow:var(--shadow);
+  backdrop-filter:blur(8px);
+  position:relative;
+  overflow:hidden;
+}
+.card::after{
+  content:"";
+  position:absolute;
+  inset:10px;
+  border:1px dashed rgba(75,85,99,.24);
+  border-radius:16px;
+  pointer-events:none;
+}
+.tabs{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:8px;
+  margin-bottom:14px;
+}
+.tab{
+  border:1px solid #707783;
+  background:
+    linear-gradient(180deg, #7b8491, #525a66),
+    repeating-linear-gradient(135deg, rgba(255,255,255,.08) 0 2px, transparent 2px 8px);
+  color:#f8fafc;
+  border-radius:14px;
+  padding:14px 10px;
+  font-weight:800;
+  font-size:16px;
+  letter-spacing:.04em;
+  cursor:pointer;
+  min-height:52px;
+  text-shadow:0 1px 0 rgba(0,0,0,.35);
+}
+.tab.active{
+  background:
+    linear-gradient(180deg, #8e98a5, var(--accent)),
+    repeating-linear-gradient(135deg, rgba(255,255,255,.08) 0 2px, transparent 2px 8px);
+  color:white;
+  border-color:transparent;
+  box-shadow:0 10px 18px rgba(0,0,0,.22);
+}
 .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px}
 label{font-size:13px;font-weight:bold;color:#334155}
-select{width:100%;margin-top:7px;padding:16px 14px;border:1px solid #97a1ac;border-radius:14px;font-size:20px;background:linear-gradient(180deg,#f8fafc,#e2e8f0);color:var(--ink);min-height:58px}
-.action{width:100%;margin-top:14px;padding:16px;border:1px solid #2d1d14;border-radius:16px;color:white;background:linear-gradient(180deg,#6b7280,#3f4754);font-size:20px;font-weight:800;min-height:58px;cursor:pointer}
-.result{margin-top:16px;padding:16px;border-radius:18px;border:1px solid #c0c8d2;border-left:8px solid var(--accent2);background:linear-gradient(180deg,#f7fafc,var(--green))}
-.result h2{margin:0 0 12px;font-size:clamp(22px,4vw,30px)}
-.row{display:grid;grid-template-columns:minmax(120px,180px) 1fr;gap:10px;border-top:1px solid #c9d2dc;padding:12px 0;font-size:clamp(16px,3vw,21px)}
+select{
+  width:100%;
+  margin-top:7px;
+  padding:16px 14px;
+  border:1px solid #97a1ac;
+  border-radius:14px;
+  font-size:20px;
+  background:
+    linear-gradient(180deg, #f8fafc, #e2e8f0),
+    repeating-linear-gradient(90deg, rgba(17,24,39,.04) 0 1px, transparent 1px 12px);
+  color:var(--ink);
+  min-height:58px;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.9);
+}
+button{
+  -webkit-tap-highlight-color:transparent;
+}
+.action{
+  width:100%;
+  background:
+    linear-gradient(180deg, #6b7280, #3f4754),
+    repeating-linear-gradient(135deg, rgba(255,255,255,.06) 0 2px, transparent 2px 8px);
+  color:white;
+  border:1px solid #2d1d14;
+  border-radius:16px;
+  padding:16px;
+  margin-top:14px;
+  font-size:20px;
+  font-weight:800;
+  cursor:pointer;
+  min-height:58px;
+  box-shadow:0 12px 24px rgba(42,28,20,.26);
+}
+.action:active,
+.tab:active{
+  transform:translateY(1px);
+}
+.result{
+  background:
+    linear-gradient(180deg, #f7fafc, var(--green)),
+    repeating-linear-gradient(90deg, rgba(17,24,39,.04) 0 1px, transparent 1px 16px);
+  border:1px solid #c0c8d2;
+  border-left:8px solid var(--accent2);
+  border-radius:18px;
+  padding:16px;
+  margin-top:16px;
+}
+.result h2{
+  margin:0 0 12px;
+  font-size:clamp(22px, 4vw, 30px);
+  line-height:1.1;
+}
+.row{
+  display:grid;
+  grid-template-columns:minmax(120px, 180px) 1fr;
+  gap:10px;
+  border-top:1px solid #c9d2dc;
+  padding:12px 0;
+  font-size:clamp(16px, 3vw, 21px);
+}
 .row:first-of-type{border-top:0}
 .label{font-weight:bold;color:#1f2937}
 .value{font-weight:bold}
 .hidden{display:none}
-.note{font-size:12px;color:#d1d8e0;margin-top:10px;text-align:center}
-@media(max-width:700px){.row{grid-template-columns:1fr}.tabs{gap:6px}.tab{font-size:14px;padding:12px 8px;min-height:48px}.action,select{font-size:18px}}
+.note{
+  font-size:12px;
+  color:#d1d8e0;
+  margin-top:10px;
+  text-align:center;
+}
+@media(max-width:700px){
+  main{padding:0 10px 18px}
+  .card{padding:14px}
+  .row{grid-template-columns:1fr}
+  .tabs{gap:6px}
+  .tab{font-size:14px;padding:12px 8px;min-height:48px}
+  select{font-size:18px}
+  .action{font-size:18px}
+}
 </style>
 </head>
 <body>
 <div class="page">
-  <div class="wrap">
-    <header>
-      <h1>Tube Tolerance Lookup</h1>
-      <div class="sub">Standalone public page</div>
-    </header>
-    <section class="card">
-      <div class="tabs">
-        <button class="tab active" id="tab-round" onclick="setShape('round')">ROUND</button>
-        <button class="tab" id="tab-square" onclick="setShape('square')">SQUARE</button>
-        <button class="tab" id="tab-rectangle" onclick="setShape('rectangle')">RECTANGLE</button>
-      </div>
-      <div id="round-inputs" class="grid">
-        <div><label>Tube size<select id="round_size" onchange="lookup()"></select></label></div>
-        <div><label>Gauge<select id="round_gauge" onchange="lookup()"></select></label></div>
-      </div>
-      <div id="square-inputs" class="grid hidden">
-        <div><label>Tube size<select id="sq_size" onchange="lookup()"></select></label></div>
-        <div><label>Gauge<select id="sq_gauge" onchange="lookup()"></select></label></div>
-      </div>
-      <div id="rectangle-inputs" class="grid hidden">
-        <div><label>Tube size<select id="rec_size" onchange="lookup()"></select></label></div>
-        <div><label>Gauge<select id="rec_gauge" onchange="lookup()"></select></label></div>
-      </div>
-      <button class="action" onclick="lookup()">Show Results</button>
-      <div id="out" class="result"></div>
-      <div class="note">ASTM 513A Tolerance Chart</div>
-    </section>
+<header>
+  <div class="brand">
+    <h1>Tolerance Calculator</h1>
+    <div class="sub">ASTM 531A Specifications</div>
   </div>
+</header>
+
+<main>
+<section class="card">
+  <div class="tabs">
+    <button class="tab active" id="tab-round" onclick="setShape('round')">ROUND</button>
+    <button class="tab" id="tab-square" onclick="setShape('square')">SQUARE</button>
+    <button class="tab" id="tab-rectangle" onclick="setShape('rectangle')">RECTANGLE</button>
+  </div>
+
+  <div id="round-inputs" class="grid">
+    <div><label>Tube size<select id="round_size"></select></label></div>
+    <div><label>Gauge<select id="round_gauge"></select></label></div>
+  </div>
+
+  <div id="square-inputs" class="grid hidden">
+    <div><label>Tube size<select id="sq_size"></select></label></div>
+    <div><label>Gauge<select id="sq_gauge"></select></label></div>
+  </div>
+
+  <div id="rectangle-inputs" class="grid hidden">
+    <div><label>Tube size<select id="rec_size"></select></label></div>
+    <div><label>Gauge<select id="rec_gauge"></select></label></div>
+  </div>
+
+  <button class="action" onclick="lookup()">Show Results</button>
+  <div id="out" class="result"></div>
+  <div class="note">ASTM 513A Tolerance Chart</div>
+</section>
+</main>
 </div>
+
 <script>
-let currentShape="round";
-const gauges=[["18 ga",0.049],["16 ga",0.065],["14 ga",0.083],["13 ga",0.095],["12 ga",0.109],["11 ga",0.120],["10 ga",0.134]];
-const roundSizes=[0.500,0.625,0.750,0.875,1.000,1.125,1.250,1.375,1.500,1.625,1.750,2.000,2.250,2.500,2.750,3.000];
-const squareSizes=[0.500,0.625,0.750,0.875,1.000,1.125,1.250,1.500,1.750,2.000,2.250,2.500,3.000];
-const rectangleSizes=[[1.000,0.500],[1.500,0.750],[1.500,1.000],[2.000,1.000],[2.000,1.250],[2.000,1.500],[2.500,1.500],[3.000,1.500],[3.000,2.000]];
-const fmt=n=>Number(n).toFixed(3);
-const range=(n,tol)=>`${fmt(n-tol)} - ${fmt(n+tol)} (± ${fmt(tol)})`;
-function fillSelect(id, items){const sel=document.getElementById(id);sel.innerHTML="";for(const item of items){const opt=document.createElement("option");opt.value=item.value;opt.textContent=item.label;sel.appendChild(opt);}}
-function fillGauge(id){const sel=document.getElementById(id);sel.innerHTML="";for(const g of gauges){const opt=document.createElement("option");opt.value=String(g[1]);opt.textContent=`${g[0]} (${fmt(g[1])})`;sel.appendChild(opt);}}
-function gaugeLabel(wall){const found=gauges.find(g=>Math.abs(g[1]-wall)<0.0001);return found?`${found[0]} (${fmt(found[1])})`:fmt(wall);}
-function roundOdTol(od,wall){const rows=[[0.500,1.125,0.065,0.134,0.0035],[1.125,2.000,0.065,0.083,0.005],[1.125,2.000,0.095,0.180,0.005],[1.125,2.000,0.203,0.220,0.005],[1.125,2.000,0.238,0.259,0.005],[1.125,2.000,0.281,0.320,0.005]];for(const row of rows){if(od>=row[0]&&od<=row[1]&&wall>=row[2]&&wall<=row[3])return row[4];}return null;}
-function sqRecTol(dim,wall){const rows=[[0.500,0.625,0.020,0.083,0.004],[0.625,1.125,0.022,0.156,0.005],[1.125,1.500,0.025,0.192,0.006],[1.500,2.000,0.032,0.192,0.008],[2.000,3.000,0.035,0.259,0.010]];for(const row of rows){if(dim>=row[0]&&dim<=row[1]&&wall>=row[2]&&wall<=row[3])return row[4];}return null;}
-function twist(dim){if(dim<=0.500) return 0.032;if(dim<=1.500) return 0.050;if(dim<=2.500) return 0.062;if(dim<=4.000) return 0.075;return null;}
-function cornerRadius(maxdim, wall){if(wall<=0.049) return "3/64 - 5/64";if(wall<=0.065) return "1/16 - 7/64";if(wall<=0.083) return "5/64 - 1/8";if(wall<=0.095) return "3/32 - 5/32";if(wall<=0.109) return "7/64 - 9/64";if(wall<=0.120) return "1/8 - 5/32";return "5/32 - 3/16";}
-function render(title,rows){let h=`<h2>${title}</h2>`;for(const row of rows){if(row[1]!=="") h+=`<div class='row'><div class='label'>${row[0]}</div><div class='value'>${row[1]}</div></div>`;}document.getElementById("out").innerHTML=h;}
-function lookup(){if(currentShape==="round"){const od=parseFloat(document.getElementById("round_size").value);const wall=parseFloat(document.getElementById("round_gauge").value);const odtol=roundOdTol(od,wall);const wallTol=0.003;const twst=twist(od);const cr=cornerRadius(od,wall);render("Round Tube",[[`OD: ${fmt(od)}"`,odtol?range(od,odtol):""],[`Wall: ${gaugeLabel(wall)}`,wallTol?range(wall,wallTol):""],[`Twist per 12"`,twst?`${fmt(twst)}"`:""],[`Corner Radius`,cr?cr:""]]);}if(currentShape==="square"){const size=parseFloat(document.getElementById("sq_size").value);const wall=parseFloat(document.getElementById("sq_gauge").value);const dtol=sqRecTol(size,wall);const wallTol=0.003;const twst=twist(size);const cr=cornerRadius(size,wall);render("Square Tube",[[`Size: ${fmt(size)}"`,dtol?range(size,dtol):""],[`Wall: ${gaugeLabel(wall)}`,wallTol?range(wall,wallTol):""],[`Twist per 12"`,twst?`${fmt(twst)}"`:""],[`Corner Radius`,cr?cr:""]]);}if(currentShape==="rectangle"){const parts=document.getElementById("rec_size").value.split(",").map(Number);const w=parts[0];const h=parts[1];const maxdim=Math.max(w,h);const wall=parseFloat(document.getElementById("rec_gauge").value);const dtol=sqRecTol(maxdim,wall);const wallTol=0.003;const twst=twist(maxdim);const cr=cornerRadius(maxdim,wall);render("Rectangular Tube",[[`Size: ${fmt(w)}" × ${fmt(h)}"`,dtol?range(maxdim,dtol):""],[`Wall: ${gaugeLabel(wall)}`,wallTol?range(wall,wallTol):""],[`Twist per 12"`,twst?`${fmt(twst)}"`:""],[`Corner Radius`,cr?cr:""]]);}}}
-function setShape(shape){currentShape=shape;for(const s of ["round","square","rectangle"]){document.getElementById("tab-"+s).classList.toggle("active",s===shape);document.getElementById(s+"-inputs").classList.toggle("hidden",s!==shape);}lookup();}
-function init(){fillSelect("round_size",roundSizes.map(x=>({label:fmt(x),value:String(x)})));fillSelect("sq_size",squareSizes.map(x=>({label:fmt(x)+" SQ",value:String(x)})));fillSelect("rec_size",rectangleSizes.map(x=>({label:`${fmt(x[0])}" × ${fmt(x[1])}"`,value:`${x[0]},${x[1]}`})));fillGauge("round_gauge");fillGauge("sq_gauge");fillGauge("rec_gauge");lookup();}
+let currentShape = "round";
+
+const gauges = [
+  ["18 ga", 0.049],
+  ["16 ga", 0.065],
+  ["14 ga", 0.083],
+  ["13 ga", 0.095],
+  ["12 ga", 0.109],
+  ["11 ga", 0.120],
+  ["10 ga", 0.134]
+];
+
+const roundSizes = [
+  0.500,0.625,0.750,0.875,1.000,1.125,1.250,1.375,1.500,1.625,1.750,
+  2.000,2.250,2.500,2.750,3.000
+];
+
+const squareSizes = [
+  0.500,0.625,0.750,0.875,1.000,1.125,1.250,1.500,1.750,2.000,2.250,2.500,3.000
+];
+
+const rectangleSizes = [
+  [1.000,0.500],
+  [1.500,0.750],
+  [1.500,1.000],
+  [2.000,1.000],
+  [2.000,1.250],
+  [2.000,1.500],
+  [2.500,1.500],
+  [3.000,1.500],
+  [3.000,2.000]
+];
+
+function fmt(n){
+  return Number(n).toFixed(3);
+}
+
+function range(n,tol){
+  return fmt(n - tol) + " - " + fmt(n + tol) + " (± " + fmt(tol) + ")";
+}
+
+function fillSelect(id, items){
+  const sel = document.getElementById(id);
+  sel.innerHTML = "";
+  for(const item of items){
+    const opt = document.createElement("option");
+    opt.value = item.value;
+    opt.textContent = item.label;
+    sel.appendChild(opt);
+  }
+  
+}
+
+function fillGauge(id){
+  const sel = document.getElementById(id);
+  sel.innerHTML = "";
+  for(const g of gauges){
+    const opt = document.createElement("option");
+    opt.value = String(g[1]);
+    opt.textContent = g[0] + " (" + fmt(g[1]) + ")";
+    if(g[0] === "16 ga") opt.selected = true;
+    sel.appendChild(opt);
+  }
+  
+}
+
+function init(){
+  fillSelect("round_size", roundSizes.map(x => ({label:fmt(x), value:String(x)})));
+  fillSelect("sq_size", squareSizes.map(x => ({label:fmt(x) + " SQ", value:String(x)})));
+  fillSelect("rec_size", rectangleSizes.map(x => ({label:fmt(x[0]) + " x " + fmt(x[1]), value:x[0] + "," + x[1]})));
+
+  fillGauge("round_gauge");
+  fillGauge("sq_gauge");
+  fillGauge("rec_gauge");
+
+  document.getElementById("round_size").value = "2";
+  document.getElementById("sq_size").value = "2";
+  document.getElementById("rec_size").value = "3,2";
+
+}
+
+function setShape(shape){
+  currentShape = shape;
+  for(const s of ["round","square","rectangle"]){
+    document.getElementById("tab-"+s).classList.toggle("active", s===shape);
+    document.getElementById(s+"-inputs").classList.toggle("hidden", s!==shape);
+  }
+}
+
+function render(title, rows){
+ let h = "<h2>"+title+"</h2>";
+ for(const row of rows){
+   const label = row[0];
+   const value = row[1];
+   if(value !== ""){
+     h += "<div class='row'><div class='label'>"+label+"</div><div class='value'>"+value+"</div></div>";
+   }
+ }
+ document.getElementById("out").innerHTML = h;
+}
+
+function roundOdTol(od, wall){
+ const rows = [
+  [0.500,1.125,0.065,0.134,0.0035],
+  [1.125,2.000,0.065,0.083,0.005],
+  [1.125,2.000,0.095,0.180,0.005],
+  [1.125,2.000,0.203,0.220,0.005],
+  [1.125,2.000,0.238,0.259,0.005],
+  [2.000,2.500,0.065,0.083,0.006],
+  [2.000,2.500,0.095,0.220,0.006],
+  [2.000,2.500,0.238,0.259,0.006],
+  [2.500,3.000,0.065,0.083,0.008],
+  [2.500,3.000,0.095,0.220,0.008],
+  [2.500,3.000,0.238,0.259,0.008],
+  [2.500,3.000,0.284,0.320,0.010]
+ ];
+ for(const r of rows){
+   if(od >= r[0] && od <= r[1] && wall >= r[2] && wall <= r[3]) return r[4];
+ }
+ return null;
+}
+
+function sqRecTol(dim, wall){
+ const rows = [
+  [0.500,0.625,0.020,0.083,0.004],
+  [0.625,1.125,0.022,0.156,0.005],
+  [1.125,1.500,0.025,0.192,0.006],
+  [1.500,2.000,0.032,0.192,0.008],
+  [2.000,3.000,0.035,0.259,0.010]
+ ];
+ for(const r of rows){
+   if(dim >= r[0] && dim <= r[1] && wall >= r[2] && wall <= r[3]) return r[4];
+ }
+ return null;
+}
+
+function twist(dim){
+ if(dim <= 0.500) return 0.032;
+ if(dim <= 1.500) return 0.050;
+ if(dim <= 2.500) return 0.062;
+ if(dim <= 4.000) return 0.075;
+ return null;
+}
+
+function cornerRadius(maxdim, wall){
+  if(wall <= 0.049) return "3/64 - 5/64";
+  if(wall <= 0.065) return "1/16 - 7/64";
+  if(wall <= 0.083) return "5/64 - 1/8";
+  if(wall <= 0.095) return "3/32 - 5/32";
+  if(wall <= 0.109) return "1/8 - 13/64";
+  if(wall <= 0.120) return "1/8 - 7/32";
+  if(wall <= 0.134) return "5/32 - 9/32";
+  return "Check table";
+}
+
+function lookup(){
+ if(currentShape === "round"){
+   const od = parseFloat(document.getElementById("round_size").value);
+   const wall = parseFloat(document.getElementById("round_gauge").value);
+   const odtol = roundOdTol(od, wall);
+   const wallTol = wall * 0.10;
+   render("Round " + fmt(od) + " x " + gaugeLabel(wall), [
+     ["Gauge", ""],
+     ["OD", odtol ? range(od, odtol) : "Check table"],
+     ["Wall", range(wall, wallTol)],
+     ["Straightness", ".030 / 3 ft"]
+   ]);
+ }
+
+ if(currentShape === "square"){
+   const size = parseFloat(document.getElementById("sq_size").value);
+   const wall = parseFloat(document.getElementById("sq_gauge").value);
+   const dtol = sqRecTol(size, wall);
+   const wallTol = wall * 0.10;
+   const tw = twist(size);
+   render(fmt(size) + " Square x " + gaugeLabel(wall), [
+     ["Gauge", ""],
+     ["Outside", dtol ? range(size, dtol) : "Check table"],
+     ["Wall", range(wall, wallTol)],
+     ["Straightness", "1/16 / 3 ft"],
+     ["Twist", tw ? fmt(tw) + " / 3 ft" : "Check table"],
+     ["Corner radius", cornerRadius(size, wall)]
+   ]);
+ }
+
+ if(currentShape === "rectangle"){
+   const parts = document.getElementById("rec_size").value.split(",").map(Number);
+   const w = parts[0];
+   const h = parts[1];
+   const maxdim = Math.max(w,h);
+   const wall = parseFloat(document.getElementById("rec_gauge").value);
+   const dtol = sqRecTol(maxdim, wall);
+   const wallTol = wall * 0.10;
+   const tw = twist(maxdim);
+   render(fmt(w) + " x " + fmt(h) + " Rectangle x " + gaugeLabel(wall), [
+     ["Gauge", ""],
+     ["Width", dtol ? range(w, dtol) : "Check table"],
+     ["Height", dtol ? range(h, dtol) : "Check table"],
+     ["Wall", range(wall, wallTol)],
+     ["Straightness", "1/16 / 3 ft"],
+     ["Twist", tw ? fmt(tw) + " / 3 ft" : "Check table"],
+     ["Corner radius", cornerRadius(maxdim, wall)]
+   ]);
+ }
+}
+
+function gaugeLabel(wall){
+  const found = gauges.find(g => Math.abs(g[1] - wall) < 0.0001);
+  return found ? found[0] + " (" + fmt(found[1]) + ")" : fmt(wall);
+}
+
 init();
 </script>
 </body>
