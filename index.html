@@ -101,13 +101,19 @@ main{max-width:900px;margin:auto;padding:0 14px 20px}
   min-height:52px;
   text-shadow:0 1px 0 rgba(0,0,0,.35);
 }
+/* Active tab: darker grey for stronger highlight */
 .tab.active{
   background:
-    linear-gradient(180deg, #8e98a5, var(--accent)),
-    repeating-linear-gradient(135deg, rgba(255,255,255,.08) 0 2px, transparent 2px 8px);
+    linear-gradient(180deg, #52575c, #2f3438),
+    repeating-linear-gradient(135deg, rgba(255,255,255,.04) 0 2px, transparent 2px 8px);
   color:white;
   border-color:transparent;
-  box-shadow:0 10px 18px rgba(0,0,0,.22);
+  box-shadow:0 10px 22px rgba(0,0,0,.30);
+}
+/* Pressed state (mouse/touch) - temporarily darken while active */
+.tab:active{
+  transform:translateY(1px);
+  filter:brightness(0.9);
 }
 .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px}
 label{font-size:13px;font-weight:bold;color:#334155}
